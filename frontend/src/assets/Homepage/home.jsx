@@ -6,15 +6,13 @@ const API_URL = "http://localhost:5000/api"
 
 export default function Home() {
   const [theme, setTheme] = useState("pink")
-  const [bookPage, setBookPage] = useState(0)
-  const [flipDirection, setFlipDirection] = useState("next")
-  const [isFlipping, setIsFlipping] = useState(false)
   const [selectedColor, setSelectedColor] = useState("#ff4fa3")
   const [brushSize, setBrushSize] = useState(8)
   const [eraserSize, setEraserSize] = useState(24)
   const [tool, setTool] = useState("brush")
   const [savedPaintings, setSavedPaintings] = useState([])
   const [isSaving, setIsSaving] = useState(false)
+  const [previewImage, setPreviewImage] = useState(null)
 
   const canvasRef = useRef(null)
   const wrapperRef = useRef(null)
@@ -34,15 +32,23 @@ export default function Home() {
     { src: "/heart.png", alt: "Heart", className: "absolute right-[18%] bottom-[12%] h-18 w-18 opacity-80 object-contain sm:h-20 sm:w-20 animate-float-delayed" }
   ]
 
-  const photoBookPages = [
-    [
-      { src: "/aqui.png", alt: "Baby Aqui photo 1" },
-      { src: "/aqui1.jpg", alt: "Baby Aqui photo 2" }
-    ],
-    [
-      { src: "/aqui2.jpg", alt: "Baby Aqui photo 3" },
-      { src: "/aqui 3.jpg", alt: "Baby Aqui photo 4" }
-    ]
+  const photoBookImages = [
+    { src: "/aqui1.jpg", alt: "Baby Aqui photo 1" },
+    { src: "/aqui.png", alt: "Baby Aqui photo 2" },
+    { src: "/aqui2.jpg", alt: "Baby Aqui photo 3" }
+  ]
+
+  const stickerImages = [
+    { src: "/1.png", alt: "Sticker 1" },
+    { src: "/2.png", alt: "Sticker 2" },
+    { src: "/3.png", alt: "Sticker 3" },
+    { src: "/4.png", alt: "Sticker 4" },
+    { src: "/5.png", alt: "Sticker 5" },
+    { src: "/6.png", alt: "Sticker 6" },
+    { src: "/7.png", alt: "Sticker 7" },
+    { src: "/8.png", alt: "Sticker 8" },
+    { src: "/9.png", alt: "Sticker 9" },
+    { src: "/10.png", alt: "Sticker 10" }
   ]
 
   const colorOptions = useMemo(
@@ -138,27 +144,16 @@ export default function Home() {
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
-  const changePage = (direction) => {
-    if (isFlipping) return
-    setFlipDirection(direction)
-    setIsFlipping(true)
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setPreviewImage(null)
+      }
+    }
 
-    setTimeout(() => {
-      setBookPage((prev) =>
-        direction === "next"
-          ? prev === photoBookPages.length - 1
-            ? 0
-            : prev + 1
-          : prev === 0
-            ? photoBookPages.length - 1
-            : prev - 1
-      )
-    }, 260)
-
-    setTimeout(() => {
-      setIsFlipping(false)
-    }, 900)
-  }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [])
 
   const getPoint = (event) => {
     const canvas = canvasRef.current
@@ -300,30 +295,12 @@ export default function Home() {
             transform: translateY(-12px);
           }
         }
-        @keyframes pageTurnNext {
+        @keyframes sticker-scroll {
           0% {
-            transform: rotateY(0deg);
+            transform: translateX(0);
           }
           100% {
-            transform: rotateY(-160deg);
-          }
-        }
-        @keyframes pageTurnPrev {
-          0% {
-            transform: rotateY(0deg);
-          }
-          100% {
-            transform: rotateY(160deg);
-          }
-        }
-        @keyframes pageReveal {
-          0% {
-            opacity: 0.65;
-            transform: scale(0.985);
-          }
-          100% {
-            opacity: 1;
-            transform: scale(1);
+            transform: translateX(-50%);
           }
         }
         .animate-float {
@@ -335,48 +312,10 @@ export default function Home() {
         .animate-float-slow {
           animation: float 6s ease-in-out infinite;
         }
-        .page-reveal {
-          animation: pageReveal 0.45s ease;
-        }
-        .page-turn-next {
-          animation: pageTurnNext 0.8s ease-in-out forwards;
-          transform-origin: left center;
-        }
-        .page-turn-prev {
-          animation: pageTurnPrev 0.8s ease-in-out forwards;
-          transform-origin: right center;
-        }
-        .preserve-3d {
-          transform-style: preserve-3d;
-        }
-        .backface-hidden {
-          backface-visibility: hidden;
-          -webkit-backface-visibility: hidden;
+        .animate-sticker-scroll {
+          animation: sticker-scroll 28s linear infinite;
         }
       `}</style>
-
-      <div className="absolute right-5 top-5 z-20 flex items-center gap-3 rounded-full bg-white/80 p-2 shadow-lg backdrop-blur">
-        <button
-          onClick={() => setTheme("pink")}
-          className={`rounded-full px-5 py-2 text-sm font-bold transition ${
-            isPink
-              ? "bg-linear-to-r from-pink-400 via-rose-400 to-fuchsia-400 text-white shadow-md"
-              : "bg-pink-100 text-pink-500"
-          }`}
-        >
-          Pink Theme
-        </button>
-        <button
-          onClick={() => setTheme("blue")}
-          className={`rounded-full px-5 py-2 text-sm font-bold transition ${
-            !isPink
-              ? "bg-linear-to-r from-sky-400 via-cyan-400 to-blue-400 text-white shadow-md"
-              : "bg-blue-100 text-blue-500"
-          }`}
-        >
-          Blue Theme
-        </button>
-      </div>
 
       <div className="absolute inset-0">
         <div
@@ -412,8 +351,33 @@ export default function Home() {
 
       <div className="relative flex min-h-screen flex-col items-center justify-center px-6 py-16 text-center">
         <div className="relative w-full max-w-5xl">
+          <div className="relative z-20 mb-8 flex justify-center">
+            <div className="flex items-center gap-3 rounded-full bg-white/80 p-2 shadow-lg backdrop-blur">
+              <button
+                onClick={() => setTheme("pink")}
+                className={`rounded-full px-5 py-2 text-sm font-bold transition ${
+                  isPink
+                    ? "bg-linear-to-r from-pink-400 via-rose-400 to-fuchsia-400 text-white shadow-md"
+                    : "bg-pink-100 text-pink-500"
+                }`}
+              >
+                Pink Theme
+              </button>
+              <button
+                onClick={() => setTheme("blue")}
+                className={`rounded-full px-5 py-2 text-sm font-bold transition ${
+                  !isPink
+                    ? "bg-linear-to-r from-sky-400 via-cyan-400 to-blue-400 text-white shadow-md"
+                    : "bg-blue-100 text-blue-500"
+                }`}
+              >
+                Blue Theme
+              </button>
+            </div>
+          </div>
+
           <div
-            className={`absolute left-1/2 top-0 h-28 w-28 -translate-x-1/2 rounded-full blur-2xl ${
+            className={`absolute left-1/2 top-20 h-28 w-28 -translate-x-1/2 rounded-full blur-2xl ${
               isPink ? "bg-pink-200" : "bg-sky-200"
             }`}
           ></div>
@@ -496,9 +460,9 @@ export default function Home() {
                   </span>
                 </div>
 
-                <div className="mx-auto mb-8 max-w-3xl overflow-hidden rounded-4xlrder-4 border-white/80 bg-white/60 p-3 shadow-[0_20px_60px_rgba(244,114,182,0.25)] backdrop-blur">
+                <div className="mx-auto mb-8 max-w-3xl overflow-hidden rounded-4xl border-4 border-white/80 bg-white/60 p-3 shadow-[0_20px_60px_rgba(244,114,182,0.25)] backdrop-blur">
                   <video
-                    className="h-full w-full rounded-3xlct-cover shadow-lg"
+                    className="h-full w-full rounded-3xl object-cover shadow-lg"
                     controls
                     autoPlay
                     muted
@@ -521,149 +485,134 @@ export default function Home() {
                   </p>
                 </div>
 
-                <div className="mx-auto mt-10 max-w-5xl">
-                  <div className="mb-5 flex items-center justify-center">
-                    <span
-                      className={`rounded-full px-5 py-3 text-sm font-bold tracking-[0.25em] ${
-                        isPink
-                          ? "bg-white/80 text-pink-500"
-                          : "bg-white/80 text-blue-500"
-                      } shadow-lg`}
-                    >
-                      PHOTO BOOK
-                    </span>
-                  </div>
-
-                  <div className="relative mx-auto w-full max-w-4xl px-2 sm:px-6">
+                <div className="mx-auto mt-10 w-full max-w-6xl">
+                  <div
+                    className={`relative overflow-hidden rounded-[2.75rem] border-4 border-white/80 p-4 shadow-[0_30px_90px_rgba(0,0,0,0.18)] backdrop-blur sm:p-6 ${
+                      isPink
+                        ? "bg-linear-to-br from-white/85 via-pink-50/90 to-rose-100/90"
+                        : "bg-linear-to-br from-white/85 via-cyan-50/90 to-sky-100/90"
+                    }`}
+                  >
                     <div
-                      className={`relative rounded-[2.5rem] p-3 shadow-[0_30px_80px_rgba(0,0,0,0.18)] ${
-                        isPink
-                          ? "bg-linear-to-br from-rose-300 via-pink-300 to-fuchsia-400"
-                          : "bg-linear-to-brrom-sky-300 via-cyan-300 to-blue-400"
+                      className={`pointer-events-none absolute -left-16 -top-16 h-40 w-40 rounded-full blur-3xl ${
+                        isPink ? "bg-pink-200/80" : "bg-sky-200/80"
                       }`}
-                    >
-                      <div className="pointer-events-none absolute bottom-4 left-3 top-4 w-5 rounded-full bg-white/25 shadow-[inset_-6px_0_12px_rgba(255,255,255,0.25)] sm:left-5 sm:w-7"></div>
-                      <div className="pointer-events-none absolute bottom-3 left-6 top-3 w-3 rounded-full bg-black/10 blur-sm sm:left-10 sm:w-4"></div>
+                    ></div>
+                    <div
+                      className={`pointer-events-none absolute -right-16 bottom-10 h-44 w-44 rounded-full blur-3xl ${
+                        isPink ? "bg-fuchsia-200/70" : "bg-blue-200/70"
+                      }`}
+                    ></div>
 
-                      <div className="relative overflow-hidden rounded-4xl bg-[#fffafc] p-4 sm:p-6">
-                        <div className="pointer-events-none absolute inset-y-6 left-1/2 z-20 hidden w-0.5translate-x-1/2 bg-linear-to-brom-transparent via-rose-200/80 to-transparent md:block"></div>
-                        <div className="pointer-events-none absolute inset-y-6 left-1/2 z-10 hidden w-8 -translate-x-1/2 rounded-full bg-black/5 blur-md md:block"></div>
+                    <div className="relative">
+                      <div className="mb-6 flex items-center justify-center">
+                        <span
+                          className={`rounded-full px-5 py-3 text-sm font-bold tracking-[0.25em] ${
+                            isPink
+                              ? "bg-white/90 text-pink-500"
+                              : "bg-white/90 text-blue-500"
+                          } shadow-lg`}
+                        >
+                          PHOTO BOOK
+                        </span>
+                      </div>
 
-                        <div className="relative hidden min-h-115 md:grid md:grid-cols-2">
-                          <div className="relative z-10 flex h-full flex-col justify-between rounded-l-[1.75rem] bg-linear-to-brrom-white via-rose-50/70 to-white p-5 shadow-[inset_-12px_0_24px_rgba(0,0,0,0.06)]">
-                            <div className="mb-4 flex items-center justify-between">
-                              <span className={`text-xs font-bold uppercase tracking-[0.3em] ${isPink ? "text-pink-400" : "text-blue-400"}`}>
-                                Memories
-                              </span>
-                              <span className={`text-sm font-bold ${isPink ? "text-pink-500" : "text-blue-500"}`}>
-                                {bookPage * 2 + 1}
-                              </span>
-                            </div>
-
-                            <div className="rounded-3xl bg-white p-3 shadow-[0_16px_35px_rgba(0,0,0,0.08)] -rotate-2">
-                              <img
-                                src={photoBookPages[bookPage][0].src}
-                                alt={photoBookPages[bookPage][0].alt}
-                                className="h-80 w-full rounded-2xl object-cover"
-                              />
-                            </div>
-
-                            <p className={`mt-4 text-sm font-semibold ${isPink ? "text-rose-500" : "text-blue-500"}`}>
-                              Sweet little moments with Baby Aqui
-                            </p>
-                          </div>
-
-                          <div className="relative z-10 flex h-full flex-col justify-between rounded-r-[1.75rem] bg-linear-to-bl from-white via-rose-50/70 to-white p-5 shadow-[inset_12px_0_24px_rgba(0,0,0,0.06)]">
-                            <div className="mb-4 flex items-center justify-between">
-                              <span className={`text-xs font-bold uppercase tracking-[0.3em] ${isPink ? "text-pink-400" : "text-blue-400"}`}>
-                                Precious
-                              </span>
-                              <span className={`text-sm font-bold ${isPink ? "text-pink-500" : "text-blue-500"}`}>
-                                {bookPage * 2 + 2}
-                              </span>
-                            </div>
-
-                            <div className="rounded-3xlhite p-3 shadow-[0_16px_35px_rgba(0,0,0,0.08)] rotate-2">
-                              <img
-                                src={photoBookPages[bookPage][1].src}
-                                alt={photoBookPages[bookPage][1].alt}
-                                className="h-80 w-full rounded-2xl object-cover"
-                              />
-                            </div>
-
-                            <p className={`mt-4 text-sm font-semibold ${isPink ? "text-rose-500" : "text-blue-500"}`}>
-                              A beautiful page from her growing journey
-                            </p>
-                          </div>
-
-                          {isFlipping && (
-                            <div className="pointer-events-none absolute inset-0 z-30 preserve-3d">
-                              <div
-                                className={`absolute top-0 h-full w-1/2 backface-hidden ${
-                                  flipDirection === "next"
-                                    ? "left-1/2 origin-left page-turn-next"
-                                    : "left-0 origin-right page-turn-prev"
-                                }`}
-                              >
-                                <div className="relative h-full w-full overflow-hidden bg-[#fffafc] shadow-[0_20px_40px_rgba(0,0,0,0.18)]">
-                                  <div className="absolute inset-0 bg-linear-to-br from-white via-rose-50 to-white"></div>
-                                  <div className="absolute inset-y-0 left-0 w-10 bg-linear-to-rrom-black/10 to-transparent"></div>
-                                  <div className="absolute inset-y-0 right-0 w-10 bg-linear-to-lrom-black/10 to-transparent"></div>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className={`page-reveal md:hidden`}>
-                          <div className="grid gap-4">
-                            {photoBookPages[bookPage].map((photo, index) => (
+                      <div
+                        className={`relative rounded-[2.25rem] p-3 shadow-[0_24px_70px_rgba(0,0,0,0.14)] ${
+                          isPink
+                            ? "bg-linear-to-br from-rose-300 via-pink-300 to-fuchsia-400"
+                            : "bg-linear-to-br from-sky-300 via-cyan-300 to-blue-400"
+                        }`}
+                      >
+                        <div className="relative overflow-hidden rounded-4xl bg-[#fffafc] p-4 sm:p-6">
+                          <div className="grid gap-5 md:grid-cols-3">
+                            {photoBookImages.map((photo, index) => (
                               <div
                                 key={index}
                                 className="rounded-[1.75rem] bg-white p-3 shadow-[0_16px_35px_rgba(0,0,0,0.08)]"
                               >
-                                <img
-                                  src={photo.src}
-                                  alt={photo.alt}
-                                  className="h-72 w-full rounded-[1.25rem] object-cover"
-                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setPreviewImage(photo)}
+                                  className="block w-full overflow-hidden rounded-[1.25rem] focus:outline-none focus:ring-4 focus:ring-pink-200"
+                                >
+                                  <img
+                                    src={photo.src}
+                                    alt={photo.alt}
+                                    className="h-72 w-full rounded-[1.25rem] object-cover transition duration-300 hover:scale-105 md:h-80"
+                                  />
+                                </button>
+                                <p className={`mt-4 text-sm font-semibold ${isPink ? "text-rose-500" : "text-blue-500"}`}>
+                                  Sweet little memory with Baby Aqui
+                                </p>
                               </div>
                             ))}
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="mt-6 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                      <button
-                        onClick={() => changePage("prev")}
-                        className={`rounded-full px-6 py-3 text-sm font-bold text-white shadow-lg transition hover:scale-105 ${
-                          isPink
-                            ? "bg-linear-to-r from-pink-400 via-rose-400 to-fuchsia-400"
-                            : "bg-linear-to-r from-sky-400 via-cyan-400 to-blue-400"
-                        }`}
-                      >
-                        Previous Page
-                      </button>
+                      <div className="mt-8">
+                        <div className="mb-5 flex flex-col items-center justify-center gap-2">
+                          <span
+                            className={`rounded-full px-5 py-3 text-sm font-bold tracking-[0.25em] ${
+                              isPink
+                                ? "bg-white/90 text-pink-500"
+                                : "bg-white/90 text-blue-500"
+                            } shadow-lg`}
+                          >
+                            STICKER COLLECTION
+                          </span>
+                          <p className={`text-sm font-semibold ${isPink ? "text-rose-500" : "text-blue-500"}`}>
+                            Cute little stickers for Baby Aqui
+                          </p>
+                        </div>
 
-                      <div
-                        className={`rounded-full bg-white/80 px-5 py-3 text-sm font-bold ${
-                          isPink ? "text-pink-500" : "text-blue-500"
-                        } shadow-md`}
-                      >
-                        Page {bookPage * 2 + 1}-{bookPage * 2 + 2} of 4
+                        <div
+                          className={`relative overflow-hidden rounded-[2.25rem] border-4 border-white/80 px-4 py-6 shadow-[0_24px_70px_rgba(0,0,0,0.12)] ${
+                            isPink
+                              ? "bg-linear-to-r from-white/95 via-pink-50/95 to-rose-100/95"
+                              : "bg-linear-to-r from-white/95 via-cyan-50/95 to-sky-100/95"
+                          }`}
+                        >
+                          <div
+                            className={`pointer-events-none absolute left-0 top-0 z-10 h-full w-20 ${
+                              isPink
+                                ? "bg-linear-to-r from-pink-50 to-transparent"
+                                : "bg-linear-to-r from-cyan-50 to-transparent"
+                            }`}
+                          ></div>
+                          <div
+                            className={`pointer-events-none absolute right-0 top-0 z-10 h-full w-20 ${
+                              isPink
+                                ? "bg-linear-to-l from-rose-50 to-transparent"
+                                : "bg-linear-to-l from-sky-50 to-transparent"
+                            }`}
+                          ></div>
+
+                          <div className="flex w-max animate-sticker-scroll gap-5 px-4">
+                            {[...stickerImages, ...stickerImages].map((sticker, index) => (
+                              <div
+                                key={index}
+                                className={`group flex h-32 w-32 shrink-0 items-center justify-center rounded-[2rem] border-4 border-white bg-white/90 p-3 shadow-[0_16px_35px_rgba(0,0,0,0.08)] transition duration-300 hover:-translate-y-2 hover:scale-105 sm:h-40 sm:w-40 ${
+                                  isPink ? "hover:shadow-pink-200/80" : "hover:shadow-sky-200/80"
+                                }`}
+                              >
+                                <div
+                                  className={`flex h-full w-full items-center justify-center rounded-[1.5rem] ${
+                                    isPink ? "bg-pink-50/80" : "bg-sky-50/80"
+                                  }`}
+                                >
+                                  <img
+                                    src={sticker.src}
+                                    alt={sticker.alt}
+                                    className="h-full w-full object-contain transition duration-300 group-hover:rotate-3"
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       </div>
-
-                      <button
-                        onClick={() => changePage("next")}
-                        className={`rounded-full px-6 py-3 text-sm font-bold text-white shadow-lg transition hover:scale-105 ${
-                          isPink
-                            ? "bg-linear-to-r from-pink-400 via-rose-400 to-fuchsia-400"
-                            : "bg-linear-to-r from-sky-400 via-cyan-400 to-blue-400"
-                        }`}
-                      >
-                        Next Page
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -926,6 +875,28 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {previewImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-5 backdrop-blur-md"
+          onClick={() => setPreviewImage(null)}
+        >
+          <button
+            type="button"
+            onClick={() => setPreviewImage(null)}
+            className="absolute right-6 top-6 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-2xl font-bold text-slate-700 shadow-lg transition hover:scale-110"
+          >
+            ×
+          </button>
+
+          <img
+            src={previewImage.src}
+            alt={previewImage.alt}
+            onClick={(event) => event.stopPropagation()}
+            className="max-h-[88vh] max-w-[92vw] rounded-[1.5rem] object-contain shadow-[0_30px_100px_rgba(0,0,0,0.45)]"
+          />
+        </div>
+      )}
     </div>
   )
 }

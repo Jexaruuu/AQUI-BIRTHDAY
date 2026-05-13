@@ -282,6 +282,14 @@ export default function Home() {
             transform: translateY(-12px);
           }
         }
+        @keyframes photobook-scroll {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
         .animate-float {
           animation: float 4s ease-in-out infinite;
         }
@@ -290,6 +298,9 @@ export default function Home() {
         }
         .animate-float-slow {
           animation: float 6s ease-in-out infinite;
+        }
+        .animate-photobook-scroll {
+          animation: photobook-scroll 24s linear infinite;
         }
       `}</style>
 
@@ -501,11 +512,26 @@ export default function Home() {
                         }`}
                       >
                         <div className="relative overflow-hidden rounded-4xl bg-[#fffafc] p-4 sm:p-6">
-                          <div className="grid gap-5 md:grid-cols-3">
-                            {photoBookImages.map((photo, index) => (
+                          <div
+                            className={`pointer-events-none absolute left-0 top-0 z-10 h-full w-16 ${
+                              isPink
+                                ? "bg-linear-to-r from-[#fffafc] to-transparent"
+                                : "bg-linear-to-r from-[#fffafc] to-transparent"
+                            }`}
+                          ></div>
+                          <div
+                            className={`pointer-events-none absolute right-0 top-0 z-10 h-full w-16 ${
+                              isPink
+                                ? "bg-linear-to-l from-[#fffafc] to-transparent"
+                                : "bg-linear-to-l from-[#fffafc] to-transparent"
+                            }`}
+                          ></div>
+
+                          <div className="flex w-max animate-photobook-scroll gap-5">
+                            {[...photoBookImages, ...photoBookImages].map((photo, index) => (
                               <div
                                 key={index}
-                                className="rounded-[1.75rem] bg-white p-3 shadow-[0_16px_35px_rgba(0,0,0,0.08)]"
+                                className="w-72 shrink-0 rounded-[1.75rem] bg-white p-3 shadow-[0_16px_35px_rgba(0,0,0,0.08)] sm:w-80 md:w-96"
                               >
                                 <button
                                   type="button"

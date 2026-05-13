@@ -38,19 +38,6 @@ export default function Home() {
     { src: "/aqui2.jpg", alt: "Baby Aqui photo 3" }
   ]
 
-  const stickerImages = [
-    { src: "/1.png", alt: "Sticker 1" },
-    { src: "/2.png", alt: "Sticker 2" },
-    { src: "/3.png", alt: "Sticker 3" },
-    { src: "/4.png", alt: "Sticker 4" },
-    { src: "/5.png", alt: "Sticker 5" },
-    { src: "/6.png", alt: "Sticker 6" },
-    { src: "/7.png", alt: "Sticker 7" },
-    { src: "/8.png", alt: "Sticker 8" },
-    { src: "/9.png", alt: "Sticker 9" },
-    { src: "/10.png", alt: "Sticker 10" }
-  ]
-
   const colorOptions = useMemo(
     () => ["#ff4fa3", "#ff7aa8", "#ffb703", "#ff6b6b", "#7c3aed", "#3b82f6", "#10b981", "#111827", "#ffffff"],
     []
@@ -295,14 +282,6 @@ export default function Home() {
             transform: translateY(-12px);
           }
         }
-        @keyframes sticker-scroll {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
         .animate-float {
           animation: float 4s ease-in-out infinite;
         }
@@ -311,9 +290,6 @@ export default function Home() {
         }
         .animate-float-slow {
           animation: float 6s ease-in-out infinite;
-        }
-        .animate-sticker-scroll {
-          animation: sticker-scroll 28s linear infinite;
         }
       `}</style>
 
@@ -513,7 +489,7 @@ export default function Home() {
                               : "bg-white/90 text-blue-500"
                           } shadow-lg`}
                         >
-                          PHOTO BOOK
+                          CUTIE BABY AQUI
                         </span>
                       </div>
 
@@ -545,69 +521,6 @@ export default function Home() {
                                 <p className={`mt-4 text-sm font-semibold ${isPink ? "text-rose-500" : "text-blue-500"}`}>
                                   Sweet little memory with Baby Aqui
                                 </p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-8">
-                        <div className="mb-5 flex flex-col items-center justify-center gap-2">
-                          <span
-                            className={`rounded-full px-5 py-3 text-sm font-bold tracking-[0.25em] ${
-                              isPink
-                                ? "bg-white/90 text-pink-500"
-                                : "bg-white/90 text-blue-500"
-                            } shadow-lg`}
-                          >
-                            STICKER COLLECTION
-                          </span>
-                          <p className={`text-sm font-semibold ${isPink ? "text-rose-500" : "text-blue-500"}`}>
-                            Cute little stickers for Baby Aqui
-                          </p>
-                        </div>
-
-                        <div
-                          className={`relative overflow-hidden rounded-[2.25rem] border-4 border-white/80 px-4 py-6 shadow-[0_24px_70px_rgba(0,0,0,0.12)] ${
-                            isPink
-                              ? "bg-linear-to-r from-white/95 via-pink-50/95 to-rose-100/95"
-                              : "bg-linear-to-r from-white/95 via-cyan-50/95 to-sky-100/95"
-                          }`}
-                        >
-                          <div
-                            className={`pointer-events-none absolute left-0 top-0 z-10 h-full w-20 ${
-                              isPink
-                                ? "bg-linear-to-r from-pink-50 to-transparent"
-                                : "bg-linear-to-r from-cyan-50 to-transparent"
-                            }`}
-                          ></div>
-                          <div
-                            className={`pointer-events-none absolute right-0 top-0 z-10 h-full w-20 ${
-                              isPink
-                                ? "bg-linear-to-l from-rose-50 to-transparent"
-                                : "bg-linear-to-l from-sky-50 to-transparent"
-                            }`}
-                          ></div>
-
-                          <div className="flex w-max animate-sticker-scroll gap-5 px-4">
-                            {[...stickerImages, ...stickerImages].map((sticker, index) => (
-                              <div
-                                key={index}
-                                className={`group flex h-32 w-32 shrink-0 items-center justify-center rounded-[2rem] border-4 border-white bg-white/90 p-3 shadow-[0_16px_35px_rgba(0,0,0,0.08)] transition duration-300 hover:-translate-y-2 hover:scale-105 sm:h-40 sm:w-40 ${
-                                  isPink ? "hover:shadow-pink-200/80" : "hover:shadow-sky-200/80"
-                                }`}
-                              >
-                                <div
-                                  className={`flex h-full w-full items-center justify-center rounded-[1.5rem] ${
-                                    isPink ? "bg-pink-50/80" : "bg-sky-50/80"
-                                  }`}
-                                >
-                                  <img
-                                    src={sticker.src}
-                                    alt={sticker.alt}
-                                    className="h-full w-full object-contain transition duration-300 group-hover:rotate-3"
-                                  />
-                                </div>
                               </div>
                             ))}
                           </div>
